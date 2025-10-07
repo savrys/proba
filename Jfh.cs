@@ -162,7 +162,9 @@ class MatrixOperations
     {
         try
         {
-            double determinant = CalculateDeterminant(matrix);
+            // Преобразуем int[,] в double[,] для вычислений
+            double[,] doubleMatrix = ConvertToDoubleMatrix(matrix);
+            double determinant = CalculateDeterminant(doubleMatrix);
             Console.WriteLine($"\nДетерминант {matrixName} матрицы: {determinant:F2}");
         }
         catch (Exception ex)
@@ -176,13 +178,32 @@ class MatrixOperations
     {
         try
         {
-            double[,] inverse = CalculateInverse(matrix);
+            // Преобразуем int[,] в double[,] для вычислений
+            double[,] doubleMatrix = ConvertToDoubleMatrix(matrix);
+            double[,] inverse = CalculateInverse(doubleMatrix);
             PrintDoubleMatrix(inverse, $"Обратная матрица для {matrixName} матрицы");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"\nОшибка для {matrixName} матрицы: {ex.Message}");
         }
+    }
+    
+    // Преобразует матрицу int[,] в double[,] для математических операций
+    static double[,] ConvertToDoubleMatrix(int[,] matrix)
+    {
+        int rows = matrix.GetLength(0);
+        int cols = matrix.GetLength(1);
+        double[,] result = new double[rows, cols];
+        
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                result[i, j] = (double)matrix[i, j];
+            }
+        }
+        return result;
     }
     
     // Создает матрицу с указанным именем и настройками
@@ -288,7 +309,7 @@ class MatrixOperations
         {
             for (int j = 0; j < matrix.GetLength(1); j++)
             {
-                Console.Write($"{matrix[i, j],10:F2}");
+                Console.Write($"{matrix[i, j],10:F4}"); // Увеличил точность для обратной матрицы
             }
             Console.WriteLine();
         }
@@ -322,13 +343,13 @@ class MatrixOperations
     }
 
     // Проверяет, является ли матрица квадратной
-    static bool IsSquareMatrix(int[,] matrix)
+    static bool IsSquareMatrix(double[,] matrix)
     {
         return matrix.GetLength(0) == matrix.GetLength(1);
     }
 
     // Вычисляет детерминант матрицы рекурсивным методом
-    public static double CalculateDeterminant(int[,] matrix)
+    public static double CalculateDeterminant(double[,] matrix)
     {
         if (!IsSquareMatrix(matrix))
             throw new Exception("Матрица должна быть квадратной для вычисления детерминанта");
@@ -345,17 +366,17 @@ class MatrixOperations
         for (int j = 0; j < n; j++)
         {
             // Разложение по первой строке с чередованием знаков
-            det += (j % 2 == 0 ? 1 : -1) * matrix[0, j] * 
-                   CalculateDeterminant(GetMinor(matrix, 0, j));
+            double sign = (j % 2 == 0) ? 1 : -1;
+            det += sign * matrix[0, j] * CalculateDeterminant(GetMinor(matrix, 0, j));
         }
         return det;
     }
 
     // Создает минор матрицы путем исключения строки и столбца
-    private static int[,] GetMinor(int[,] matrix, int row, int col)
+    private static double[,] GetMinor(double[,] matrix, int row, int col)
     {
         int n = matrix.GetLength(0);
-        int[,] minor = new int[n - 1, n - 1];
+        double[,] minor = new double[n - 1, n - 1];
         int r = 0;
 
         // Копирование элементов, исключая указанные строку и столбец
@@ -376,14 +397,14 @@ class MatrixOperations
     }
 
     // Вычисляет обратную матрицу методом алгебраических дополнений
-    public static double[,] CalculateInverse(int[,] matrix)
+    public static double[,] CalculateInverse(double[,] matrix)
     {
         if (!IsSquareMatrix(matrix))
             throw new Exception("Обратная матрица существует только для квадратных матриц");
 
         // Вычисление определителя для проверки существования обратной матрицы
         double det = CalculateDeterminant(matrix);
-        if (det == 0)
+        if (Math.Abs(det) < 0.0000001) // Используем маленькое число вместо точного нуля
             throw new Exception("Обратная матрица не существует (определитель равен нулю)");
 
         int n = matrix.GetLength(0);
@@ -395,8 +416,8 @@ class MatrixOperations
             for (int j = 0; j < n; j++)
             {
                 // Вычисление алгебраического дополнения
-                double cofactor = ((i + j) % 2 == 0 ? 1 : -1) * 
-                                 CalculateDeterminant(GetMinor(matrix, i, j));
+                double sign = ((i + j) % 2 == 0) ? 1 : -1;
+                double cofactor = sign * CalculateDeterminant(GetMinor(matrix, i, j));
                 
                 // Транспонирование и деление на определитель
                 inverse[j, i] = cofactor / det;
