@@ -69,6 +69,13 @@ class MatrixOperations
                     Console.WriteLine("Неверный выбор! Попробуйте снова.");
                     break;
             }
+            
+            // Добавляем паузу после выполнения операции для удобства просмотра результатов
+            if (choice == "3" || choice == "4" || choice == "5")
+            {
+                Console.WriteLine("\nНажмите любую клавишу для продолжения...");
+                Console.ReadKey();
+            }
         }
     }
     
@@ -165,11 +172,15 @@ class MatrixOperations
             // Преобразуем int[,] в double[,] для вычислений
             double[,] doubleMatrix = ConvertToDoubleMatrix(matrix);
             double determinant = CalculateDeterminant(doubleMatrix);
-            Console.WriteLine($"\nДетерминант {matrixName} матрицы: {determinant:F2}");
+            Console.WriteLine($"\n=== РЕЗУЛЬТАТ ===");
+            Console.WriteLine($"Детерминант {matrixName} матрицы: {determinant:F4}");
+            Console.WriteLine($"================\n");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"\nОшибка для {matrixName} матрицы: {ex.Message}");
+            Console.WriteLine($"\n=== ОШИБКА ===");
+            Console.WriteLine($"Ошибка для {matrixName} матрицы: {ex.Message}");
+            Console.WriteLine($"=============\n");
         }
     }
     
@@ -181,11 +192,15 @@ class MatrixOperations
             // Преобразуем int[,] в double[,] для вычислений
             double[,] doubleMatrix = ConvertToDoubleMatrix(matrix);
             double[,] inverse = CalculateInverse(doubleMatrix);
+            Console.WriteLine($"\n=== РЕЗУЛЬТАТ ДЛЯ {matrixName.ToUpper()} МАТРИЦЫ ===");
             PrintDoubleMatrix(inverse, $"Обратная матрица для {matrixName} матрицы");
+            Console.WriteLine($"===================================\n");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"\nОшибка для {matrixName} матрицы: {ex.Message}");
+            Console.WriteLine($"\n=== ОШИБКА ===");
+            Console.WriteLine($"Ошибка для {matrixName} матрицы: {ex.Message}");
+            Console.WriteLine($"=============\n");
         }
     }
     
@@ -302,14 +317,14 @@ class MatrixOperations
     static void PrintDoubleMatrix(double[,] matrix, string title = "")
     {
         if (!string.IsNullOrEmpty(title))
-            Console.WriteLine($"\n{title}:");
+            Console.WriteLine($"{title}:");
             
         // Вывод вещественных чисел с двумя знаками после запятой
         for (int i = 0; i < matrix.GetLength(0); i++)
         {
             for (int j = 0; j < matrix.GetLength(1); j++)
             {
-                Console.Write($"{matrix[i, j],10:F4}"); // Увеличил точность для обратной матрицы
+                Console.Write($"{matrix[i, j],10:F4}");
             }
             Console.WriteLine();
         }
@@ -338,8 +353,9 @@ class MatrixOperations
             }
         }
         
-        Console.WriteLine("\nРезультат сложения матриц:");
+        Console.WriteLine("\n=== РЕЗУЛЬТАТ СЛОЖЕНИЯ ===");
         PrintMatrix(result);
+        Console.WriteLine("========================\n");
     }
 
     // Проверяет, является ли матрица квадратной
@@ -404,7 +420,7 @@ class MatrixOperations
 
         // Вычисление определителя для проверки существования обратной матрицы
         double det = CalculateDeterminant(matrix);
-        if (Math.Abs(det) < 0.0000001) // Используем маленькое число вместо точного нуля
+        if (Math.Abs(det) < 0.0000001)
             throw new Exception("Обратная матрица не существует (определитель равен нулю)");
 
         int n = matrix.GetLength(0);
