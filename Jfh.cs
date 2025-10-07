@@ -14,6 +14,7 @@ class MatrixCalculator
             Console.WriteLine("1 - Создание и заполнение матрицы");
             Console.WriteLine("2 - Нахождение детерминанта матрицы");
             Console.WriteLine("3 - Нахождение обратной матрицы");
+            Console.WriteLine("4 - Сложение матриц");
             Console.WriteLine("0 - Выход из программы");
             
             Console.Write("Ваш выбор: ");
@@ -30,6 +31,9 @@ class MatrixCalculator
                     break;
                 case "3":
                     CalculateInverseMatrix();
+                    break;
+                case "4":
+                    AddMatrices();
                     break;
                 case "0":
                     Console.WriteLine("Программа завершена.");
@@ -75,6 +79,62 @@ class MatrixCalculator
         // Вывод созданной матрицы
         Console.WriteLine("\nСозданная матрица:");
         PrintMatrix(matrix);
+    }
+    
+    // Метод для сложения матриц
+    static void AddMatrices()
+    {
+        Console.WriteLine("\n--- СЛОЖЕНИЕ МАТРИЦ ---");
+        
+        // Создание первой матрицы
+        Console.WriteLine("Создание первой матрицы:");
+        double[,] matrix1 = CreateSingleMatrix();
+        
+        // Создание второй матрицы
+        Console.WriteLine("\nСоздание второй матрицы:");
+        double[,] matrix2 = CreateSingleMatrix();
+        
+        // Проверка возможности сложения матриц
+        if (matrix1.GetLength(0) != matrix2.GetLength(0) || 
+            matrix1.GetLength(1) != matrix2.GetLength(1))
+        {
+            Console.WriteLine("Ошибка: Матрицы нельзя сложить - разные размеры!");
+            Console.WriteLine($"Размер первой матрицы: {matrix1.GetLength(0)}x{matrix1.GetLength(1)}");
+            Console.WriteLine($"Размер второй матрицы: {matrix2.GetLength(0)}x{matrix2.GetLength(1)}");
+            return;
+        }
+        
+        // Выполнение сложения матриц
+        double[,] result = AddTwoMatrices(matrix1, matrix2);
+        
+        // Вывод результатов
+        Console.WriteLine("\nПервая матрица:");
+        PrintMatrix(matrix1);
+        
+        Console.WriteLine("\nВторая матрица:");
+        PrintMatrix(matrix2);
+        
+        Console.WriteLine("\nРезультат сложения:");
+        PrintMatrix(result);
+    }
+    
+    // Метод для выполнения сложения двух матриц
+    static double[,] AddTwoMatrices(double[,] matrix1, double[,] matrix2)
+    {
+        int rows = matrix1.GetLength(0);
+        int cols = matrix1.GetLength(1);
+        double[,] result = new double[rows, cols];
+        
+        // Поэлементное сложение матриц
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                result[i, j] = matrix1[i, j] + matrix2[i, j];
+            }
+        }
+        
+        return result;
     }
     
     // Метод для заполнения матрицы с клавиатуры
